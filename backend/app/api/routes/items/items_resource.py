@@ -24,9 +24,11 @@ from app.models.schemas.items import (
 from app.resources import strings
 from app.services.items import check_item_exists, get_slug_for_item
 from app.services.event import send_event
+import openai 
 
 router = APIRouter()
 
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 @router.get("", response_model=ListOfItemsInResponse, name="items:list-items")
 async def list_items(
@@ -77,6 +79,14 @@ async def create_new_item(
         tags=item_create.tags,
         image=item_create.image
     )
+    if not image_create.image:
+        response = openai.Image.create(
+          prompt=item_create.title,
+          n=1,
+          size='256x256'
+      )
+      item_create.image = response['data'][0]['url']
+
     send_event('item_created', {'item': item_create.title})
     return ItemInResponse(item=ItemForResponse.from_orm(item))
 
