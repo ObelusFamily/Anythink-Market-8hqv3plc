@@ -25,6 +25,7 @@ from app.resources import strings
 from app.services.items import check_item_exists, get_slug_for_item
 from app.services.event import send_event
 import openai 
+import os
 
 router = APIRouter()
 
@@ -80,12 +81,8 @@ async def create_new_item(
         image=item_create.image
     )
     if not image_create.image:
-        response = openai.Image.create(
-          prompt=item_create.title,
-          n=1,
-          size='256x256'
-      )
-      item_create.image = response['data'][0]['url']
+        response = openai.Image.create(prompt=item_create.title,n=1,size='256x256')
+        item_create.image = response['data'][0]['url']
 
     send_event('item_created', {'item': item_create.title})
     return ItemInResponse(item=ItemForResponse.from_orm(item))
