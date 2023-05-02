@@ -16,7 +16,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - OPENAI_API_KEY=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
       - APP_ENV=dev
       - SECRET_KEY=secret
       - DEBUG=True
